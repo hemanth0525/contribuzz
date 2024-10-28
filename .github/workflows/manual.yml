@@ -51,9 +51,11 @@ jobs:
 
           # Prepare the JSON payload for updating the Gist
           payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
-          content_string=$(echo "$payload" | jq -c .)
+          
+          # Prepare the content for subscribers.json as a string
+          content_string=$(echo "$payload" | jq -c '.')
 
-          # Update Gist with new list
+          # Update Gist with the new list
           response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
