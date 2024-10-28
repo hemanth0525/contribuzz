@@ -62,10 +62,8 @@ jobs:
             -d "{\"files\": {\"subscribers.json\": {\"content\": $(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')}}}}"
 
           echo "Thank you for subscribing!"
-        else:
-          echo "No action taken."
 
-      - name: Handle error
+      - name: Skip action if email exists
         if: steps.check_email.outputs.email_exists == 'true'
         run: |
           echo "Failed to add subscriber: Email already exists."
