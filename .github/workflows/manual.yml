@@ -18,11 +18,17 @@ jobs:
           email="${{ github.event.inputs.email }}"
           # Fetch the existing Gist content
           gist_response=$(curl -X GET "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
-            -H "Authorization: token $GIST_TOKEN" \
+            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json")
-          
-          # Extract the current email list
-          email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
+
+          # Check if the Gist response is valid
+          if [[ $(echo "$gist_response" | jq -r '.files["subscribers.json"] | .content // empty') == "" ]]; then
+            echo "subscribers.json not found or is empty."
+            email_list="[]"
+          else
+            # Extract the current email list
+            email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
+          fi
           
           # Convert existing email list to an array
           email_array=($(echo "$email_list" | jq -r '.[]'))
@@ -40,15 +46,20 @@ jobs:
         if: env.exists == 'false'
         run: |
           email="${{ github.event.inputs.email }}"
-          
+
           # Fetch the existing Gist content again
           gist_response=$(curl -X GET "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
-            -H "Authorization: token $GIST_TOKEN" \
+            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json")
 
           # Extract the current email list again
-          email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
-          
+          if [[ $(echo "$gist_response" | jq -r '.files["subscribers.json"] | .content // empty') == "" ]]; then
+            echo "subscribers.json not found or is empty."
+            email_list="[]"
+          else
+            email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
+          fi
+
           # Convert existing email list to an array again
           email_array=($(echo "$email_list" | jq -r '.[]'))
 
@@ -60,7 +71,7 @@ jobs:
 
           # Update Gist with new list
           response=$(curl -X PATCH "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
-            -H "Authorization: token $GIST_TOKEN" \
+            -H "Authorization: token ${{ secrets.GIST_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
             -d "$payload")
