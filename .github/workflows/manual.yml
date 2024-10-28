@@ -6,7 +6,7 @@ on:
       email:
         description: 'Email address to subscribe'
         required: true
-        default: 'example@example.com'
+        default: 'test@example.com'
 
 jobs:
   subscribe:
@@ -53,7 +53,7 @@ jobs:
           payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
           
           # Prepare the content for subscribers.json as a string
-          content_string=$(echo "$payload" | jq -c '.')
+          content_string=$(echo "$payload" | jq '.')
 
           # Properly escape the JSON string for the curl command
           content_string_escaped=$(echo "$content_string" | jq -sRr @json | sed 's/^"\(.*\)"$/\1/')
