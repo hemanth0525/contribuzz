@@ -1,4 +1,4 @@
-name: Manage Gist Subscribers
+name: Add Subscribers
 
 on:
   workflow_dispatch:
@@ -49,15 +49,15 @@ jobs:
           # Add the new email to the list
           updated_email_list=$(echo "${email_array[@]}" | jq -R . | jq -s . | jq --arg email "$email" '. += [$email]')
 
-          # Prepare the JSON payload for updating the Gist
-          payload=$(jq -n --argjson list "$updated_email_list" '{ files: { "subscribers.json": { content: $list | tojson } } }')
+          # Prepare the JSON payload for updating the Gist in the desired format
+          payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
 
           # Update Gist with new list
           response=$(curl -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "$payload")
+            -d "$(echo "$payload" | jq -c '.')") # Use compact format to send
 
           echo "$response"
           echo "Thank you for subscribing!"
