@@ -55,12 +55,15 @@ jobs:
           # Prepare the content for subscribers.json as a string
           content_string=$(echo "$payload" | jq -c '.')
 
+          # Properly escape the JSON string for the curl command
+          content_string_escaped=$(echo "$content_string" | jq -sRr @json | sed 's/^"\(.*\)"$/\1/')
+
           # Update Gist with the new list
           response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "{\"files\": {\"subscribers.json\": {\"content\": \"$content_string\"}}}")
+            -d "{\"files\": {\"subscribers.json\": {\"content\": \"$content_string_escaped\"}}}")
 
           # Output response and subscription confirmation
           echo "$response"
