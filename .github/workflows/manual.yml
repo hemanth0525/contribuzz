@@ -49,10 +49,9 @@ jobs:
           # Add the new email to the list
           updated_email_list=$(echo "${email_array[@]}" | jq -R . | jq -s . | jq --arg email "$email" '. += [$email]')
 
-          # Prepare the JSON payload for updating the Gist in the desired format
-          # Ensure that the content is a string
-          json_payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
-          content_string=$(echo "$json_payload" | jq -c .)
+          # Prepare the JSON payload for updating the Gist
+          payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
+          content_string=$(echo "$payload" | jq -c .)
 
           # Update Gist with new list
           response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
@@ -61,5 +60,10 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"files\": {\"subscribers.json\": {\"content\": $content_string}}}")
 
+          # Output response and subscription confirmation
           echo "$response"
-          echo "Thank you for subscribing!"
+          if [[ $(echo "$response" | jq -r '.message // empty') == "" ]]; then
+            echo "Thank you for subscribing!"
+          else
+            echo "Error: $(echo "$response" | jq -r '.message')"
+          fi
