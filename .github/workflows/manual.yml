@@ -47,7 +47,7 @@ jobs:
           fi
 
           # Add the new email to the list
-          updated_email_list=$(echo "${email_array[@]}" | jq -R . | jq -s . | jq --arg email "$email" '. += [$email]')
+          updated_email_list=$(echo "$email_list" | jq --arg email "$email" '. += [$email]')
 
           # Prepare the JSON payload for updating the Gist
           payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
@@ -60,7 +60,7 @@ jobs:
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "{\"files\": {\"subscribers.json\": {\"content\": $content_string}}}")
+            -d "{\"files\": {\"subscribers.json\": {\"content\": \"$content_string\"}}}")
 
           # Output response and subscription confirmation
           echo "$response"
