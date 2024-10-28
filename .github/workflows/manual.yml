@@ -57,7 +57,7 @@ jobs:
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "$(echo "$payload" | jq -c '.')") # Use compact format to send
+            -d "{\"files\": {\"subscribers.json\": {\"content\": $payload}}}")
 
           echo "$response"
           echo "Thank you for subscribing!"
