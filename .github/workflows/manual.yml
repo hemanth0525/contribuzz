@@ -25,7 +25,7 @@ jobs:
           email="${{ github.event.inputs.email }}"
 
           # Fetch the existing Gist content
-          gist_response=$(curl -X GET "https://api.github.com/gists/$GIST_ID" \
+          gist_response=$(curl -s -X GET "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json")
 
@@ -53,7 +53,7 @@ jobs:
           payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
 
           # Update Gist with new list
-          response=$(curl -X PATCH "https://api.github.com/gists/$GIST_ID" \
+          response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
