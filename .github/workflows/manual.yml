@@ -50,14 +50,16 @@ jobs:
           updated_email_list=$(echo "${email_array[@]}" | jq -R . | jq -s . | jq --arg email "$email" '. += [$email]')
 
           # Prepare the JSON payload for updating the Gist in the desired format
-          payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
+          # Ensure that the content is a string
+          json_payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
+          content_string=$(echo "$json_payload" | jq -c .)
 
           # Update Gist with new list
           response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "{\"files\": {\"subscribers.json\": {\"content\": $payload}}}")
+            -d "{\"files\": {\"subscribers.json\": {\"content\": $content_string}}}")
 
           echo "$response"
           echo "Thank you for subscribing!"
