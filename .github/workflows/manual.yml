@@ -6,64 +6,64 @@ on:
       email:
         description: 'Email address to subscribe'
         required: true
-        default: 'example@example.com'
+        type: string
 
 jobs:
-  manage-subscriber:
+  add_subscriber:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set up environment variables
-        run: |
-          echo "GIST_TOKEN=${{ secrets.GIST_TOKEN }}" >> $GITHUB_ENV
-          echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
-
-      - name: Fetch Gist Content
-        id: fetch_gist
-        run: |
-          gist_response=$(curl -s -H "Authorization: token $GIST_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/gists/${{ env.GIST_ID }}")
-          echo "$gist_response" > gist_response.json
-          echo "::set-output name=gist_content::$(cat gist_response.json)"
-
-      - name: Parse existing subscribers
-        id: parse_subscribers
-        run: |
-          current_content=$(jq -r '.files["subscribers.json"].content' gist_response.json)
-          email_list=$(echo "$current_content" | jq -r '.emailList // []')
-          echo "::set-output name=email_list::$email_list"
-
-      - name: Check if email exists
+      - name: Check for existing subscriber
         id: check_email
         run: |
-          email_list="${{ steps.parse_subscribers.outputs.email_list }}"
           email="${{ github.event.inputs.email }}"
-          if echo "$email_list" | grep -q "$email"; then
+          # Fetch the existing Gist content
+          gist_response=$(curl -X GET "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json")
+          
+          # Extract the current email list
+          email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
+          
+          # Convert existing email list to an array
+          email_array=($(echo "$email_list" | jq -r '.[]'))
+
+          # Check if the email already exists
+          if [[ " ${email_array[@]} " =~ " ${email} " ]]; then
             echo "Email already exists in the notification list."
-            echo "::set-output name=email_exists::true"
+            echo "exists=true" >> $GITHUB_ENV
+            exit 1
           else
-            echo "Email does not exist."
-            echo "::set-output name=email_exists::false"
+            echo "exists=false" >> $GITHUB_ENV
           fi
 
       - name: Add new subscriber
-        if: steps.check_email.outputs.email_exists == 'false'
+        if: env.exists == 'false'
         run: |
           email="${{ github.event.inputs.email }}"
-          updated_email_list=$(echo "$email_list" | jq -R . | jq -s .)
-          updated_email_list=$(echo "$updated_email_list" | jq --arg email "$email" '. += [$email]')
           
+          # Fetch the existing Gist content again
+          gist_response=$(curl -X GET "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json")
+
+          # Extract the current email list again
+          email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
+          
+          # Convert existing email list to an array again
+          email_array=($(echo "$email_list" | jq -r '.[]'))
+
+          # Add the new email to the list
+          updated_email_list=$(echo "${email_array[@]}" | jq -R . | jq -s . | jq --arg email "$email" '. += [$email]')
+
+          # Prepare the JSON payload for updating the Gist
+          payload=$(jq -n --argjson list "$updated_email_list" '{ files: { "subscribers.json": { content: { emailList: $list } } } } }')
+
           # Update Gist with new list
-          curl -X PATCH "https://api.github.com/gists/${{ env.GIST_ID }}" \
+          response=$(curl -X PATCH "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "{\"files\": {\"subscribers.json\": {\"content\": $(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')}}}}"
+            -d "$payload")
 
+          echo "$response"
           echo "Thank you for subscribing!"
-
-      - name: Skip action if email exists
-        if: steps.check_email.outputs.email_exists == 'true'
-        run: |
-          echo "Failed to add subscriber: Email already exists."
