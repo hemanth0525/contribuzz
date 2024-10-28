@@ -1,4 +1,4 @@
-name: Manual Test Add Subscriber
+name: Test Add Subscriber API
 
 on:
   workflow_dispatch:
@@ -9,16 +9,23 @@ on:
         default: 'example@example.com'
 
 jobs:
-  test:
+  add-subscriber:
     runs-on: self-hosted  # Use your self-hosted runner
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Set up environment variables
+        run: |
+          echo "GIST_TOKEN=${{ secrets.GIST_TOKEN }}" >> $GITHUB_ENV
+          echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
 
       - name: Call Add Subscriber API
         run: |
           echo "Subscribing email: ${{ github.event.inputs.email }}"
-          curl -X POST "http://localhost:3000/api/addSubscriber" \
+          response=$(curl -X POST "http://localhost:3000/api/addSubscriber" \
             -H "Content-Type: application/json" \
-            -d '{"email": "${{ github.event.inputs.email }}"}'
+            -d "{\"email\": \"${{ github.event.inputs.email }}\"}")
+          echo "Response: $response"
+
+      - name: Check Response
+        run: |
+          echo $response | grep -q "Thank you for subscribing!" || { echo "Failed to add subscriber"; exit 1; }
