@@ -13,7 +13,6 @@ export default function Home() {
           <Hero />
           <HowItWorks />
         </main>
-        <Sidebar />
       </div>
     </div>
   )
