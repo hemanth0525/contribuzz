@@ -1,0 +1,6 @@
+# This YAML file specifies the funding configuration for the GitHub repository.
+# It indicates that the repository owner or maintainer can receive funding through GitHub Sponsors.
+# The 'github' key is followed by the username of the sponsor account.
+# In this case, the sponsor account is 'hemanth0525'.
+
+github: hemanth0525
