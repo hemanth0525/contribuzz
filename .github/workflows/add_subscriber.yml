@@ -15,7 +15,7 @@ jobs:
         env:
           EMAIL: ${{ github.event.client_payload.email }}
           GIST_ID: ${{ secrets.GIST_ID }}
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_PAT: ${{ secrets.GIST_TOKEN }}
         run: |
           # Fetch current gist content
           GIST_CONTENT=$(curl -H "Authorization: token $GH_PAT" \
