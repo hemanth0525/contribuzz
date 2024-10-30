@@ -3,8 +3,8 @@ import { Octokit } from "@octokit/rest";
 import { RequestError } from "@octokit/request-error";
 
 const GITHUB_TOKEN = process.env.GITHUB_PAT_TOKEN!;
-const GITHUB_REPO = "contribuzz";
-const GITHUB_OWNER = "hemanth0525";
+const GITHUB_REPO = process.env.GITHUB_REPO!;
+const GITHUB_OWNER = process.env.GITHUB_OWNER!;
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
