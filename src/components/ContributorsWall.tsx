@@ -83,7 +83,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
 
             // Set canvas size dynamically
             canvas.width = (avatarsPerRow * (avatarSize + padding) + padding) * scale
-            canvas.height = (rows * (avatarSize + padding + 50) + padding + 20) * scale // Extra 60px for the footer
+            canvas.height = (rows * (avatarSize + padding + 50) + padding) * scale
 
             // Enable font smoothing
             ctx.imageSmoothingEnabled = true
@@ -127,19 +127,19 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
                 }
 
                 // Draw username
-                ctx.font = `bold ${40 * scale}px Arial`
+                ctx.font = `bold ${50 * scale}px Arial`
                 ctx.fillStyle = '#ffffff'
                 ctx.textAlign = 'center'
                 ctx.fillText(contributor.login, x + avatarSize / 2, y + avatarSize + 60 * scale)
 
                 // Draw contributions
-                ctx.font = `${30 * scale}px Arial`
+                ctx.font = `${40 * scale}px Arial`
                 ctx.fillStyle = '#8b949e'
-                ctx.fillText(`${contributor.contributions}+ contributions`, x + avatarSize / 2, y + avatarSize + 85 * scale)
+                ctx.fillText(`${contributor.contributions}+ contributions`, x + avatarSize / 2, y + avatarSize + 90 * scale)
             }
 
             // Draw footer
-            ctx.font = `${40 * scale}px Arial`
+            ctx.font = `${45 * scale}px Arial`
             ctx.fillStyle = '#ffffff'
             ctx.textAlign = 'center'
             ctx.fillText('Made with ❤️ by Contri.Buzz', canvas.width / 2, canvas.height - 25 * scale)
@@ -258,7 +258,9 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
                 })
             );
 
-            setContributors(detailedContributors);
+            const limitedContributors = detailedContributors.slice(0, 100);
+            setContributors(limitedContributors);
+
         } catch (err) {
             console.error('Error fetching contributors:', err);
             setError('Failed to fetch contributors. Please check the repository URL and try again.');
