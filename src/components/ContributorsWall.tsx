@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Users, X, Image as ImageIcon, Code, Copy, CopyCheck, CheckCircleIcon } from 'lucide-react'
-import html2canvas from 'html2canvas-pro'
 import sampleContributors from '../../public/sample.json'
 
 type Contributor = {
@@ -62,139 +61,211 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
     }, [contributors, repo, initialRepo])
 
     const generateWallImage = async (repoUrl: string) => {
-        if (!wallRef.current) {
-            console.error('wallRef is null')
-            return
-        }
-
         if (!repoUrl) {
             console.error('Repo URL is empty')
             return
         }
 
-
         console.log('Generating wall image...')
         try {
-            const canvas = await html2canvas(wallRef.current, {
-                backgroundColor: '#0d1117',
-                scale: 2,
-            })
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
 
-            const textHeight = 51
-            const newCanvas = document.createElement('canvas')
-            newCanvas.width = canvas.width
-            newCanvas.height = canvas.height + textHeight
+            if (!ctx) {
+                throw new Error('Failed to get 2D context')
+            }
 
-            const ctx = newCanvas.getContext('2d')
+            const scale = 2 // Increase scale for better quality
+            const avatarSize = 250 * scale
+            const padding = 40 * scale
+            const avatarsPerRow = 7
+            const rows = Math.ceil(contributors.length / avatarsPerRow)
 
-            if (ctx) {
-                ctx.fillStyle = '#0d1117'
-                ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
-                ctx.drawImage(canvas, 0, 0)
+            // Set canvas size dynamically
+            canvas.width = (avatarsPerRow * (avatarSize + padding) + padding) * scale
+            canvas.height = (rows * (avatarSize + padding + 50) + padding + 20) * scale // Extra 60px for the footer
 
-                ctx.font = '46px Arial'
+            // Enable font smoothing
+            ctx.imageSmoothingEnabled = true
+            ctx.imageSmoothingQuality = 'high'
+
+            // Set background
+            ctx.fillStyle = '#0d1117'
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+            // Draw contributors
+            for (let i = 0; i < contributors.length; i++) {
+                const contributor = contributors[i]
+                const row = Math.floor(i / avatarsPerRow)
+                const col = i % avatarsPerRow
+                const x = (padding + col * (avatarSize + padding)) * scale
+                const y = (padding + row * (avatarSize + padding + 20)) * scale
+
+                // Load and draw avatar
+                try {
+                    const img = await loadImage(contributor.avatar_url)
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.arc(x + avatarSize / 2, y + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2)
+                    ctx.strokeStyle = '#58a6ff'
+                    ctx.lineWidth = 15 * scale
+                    ctx.stroke()
+                    ctx.closePath()
+                    ctx.clip()
+                    ctx.drawImage(img, x, y, avatarSize, avatarSize)
+                    ctx.restore()
+                } catch (error) {
+                    console.error(`Failed to load avatar for ${contributor.login}:`, error)
+                    // Draw a placeholder circle if the avatar fails to load
+                    ctx.beginPath()
+                    ctx.arc(x + avatarSize / 2, y + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2)
+                    ctx.fillStyle = '#30363d'
+                    ctx.fill()
+                    ctx.strokeStyle = '#58a6ff'
+                    ctx.lineWidth = 3 * scale
+                    ctx.stroke()
+                }
+
+                // Draw username
+                ctx.font = `bold ${40 * scale}px Arial`
                 ctx.fillStyle = '#ffffff'
                 ctx.textAlign = 'center'
-                ctx.fillText('Made with ❤️ by Contri.Buzz', newCanvas.width / 2, (newCanvas.height - 8))
+                ctx.fillText(contributor.login, x + avatarSize / 2, y + avatarSize + 60 * scale)
 
-                const imageDataUrl = newCanvas.toDataURL('image/png')
-                console.log('Image data URL generated')
-
-                const sanitizedFileName = `${repoUrl.replace(/\//g, '-')}.png`
-                console.log('Sanitized file name:', sanitizedFileName)
-
-                const response = await fetch('/api/save-wall-image', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fileName: sanitizedFileName,
-                        imageDataUrl: imageDataUrl,
-                    }),
-                })
-
-                console.log('Response status:', response.status)
-                console.log('Response body:', await response.text())
-
-                if (!response.ok) {
-                    throw new Error('Failed to save the wall image via API')
-                }
-                console.log('Wall saved successfully via API:')
-                setIsWallSaved(true)
-            } else {
-                console.error('Failed to get 2D context')
-                setError('Failed to generate or save the wall image. Please try again.')
+                // Draw contributions
+                ctx.font = `${30 * scale}px Arial`
+                ctx.fillStyle = '#8b949e'
+                ctx.fillText(`${contributor.contributions}+ contributions`, x + avatarSize / 2, y + avatarSize + 85 * scale)
             }
+
+            // Draw footer
+            ctx.font = `${40 * scale}px Arial`
+            ctx.fillStyle = '#ffffff'
+            ctx.textAlign = 'center'
+            ctx.fillText('Made with ❤️ by Contri.Buzz', canvas.width / 2, canvas.height - 25 * scale)
+
+            // Create a new canvas with the original dimensions
+            const outputCanvas = document.createElement('canvas')
+            outputCanvas.width = canvas.width / scale
+            outputCanvas.height = canvas.height / scale
+            const outputCtx = outputCanvas.getContext('2d')
+
+            if (!outputCtx) {
+                throw new Error('Failed to get 2D context for output canvas')
+            }
+
+            // Enable font smoothing for the output canvas
+            outputCtx.imageSmoothingEnabled = true
+            outputCtx.imageSmoothingQuality = 'high'
+
+            // Draw the scaled-down image onto the output canvas
+            outputCtx.drawImage(canvas, 0, 0, outputCanvas.width, outputCanvas.height)
+
+            const imageDataUrl = outputCanvas.toDataURL('image/png')
+            console.log('Image data URL generated')
+
+            const sanitizedFileName = `${repoUrl.replace(/\//g, '-')}.png`
+            console.log('Sanitized file name:', sanitizedFileName)
+
+            const response = await fetch('/api/save-wall-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fileName: sanitizedFileName,
+                    imageDataUrl: imageDataUrl,
+                }),
+            })
+
+            console.log('Response status:', response.status)
+            const responseData = await response.json()
+            console.log('Response body:', responseData)
+
+            if (!response.ok) {
+                throw new Error(responseData.error || 'Failed to save the wall image via API')
+            }
+            console.log('Wall saved successfully via API:', responseData.url)
+            setIsWallSaved(true)
         } catch (error) {
             console.error('Error during image generation or save:', error)
-            setError('Failed to generate or save the wall image. Please try again.')
+            setError(`Failed to generate or save the wall image: ${(error as Error).message}`)
         }
+    }
+
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+            const img = new window.Image()
+            img.crossOrigin = 'anonymous'
+            img.onload = () => resolve(img)
+            img.onerror = reject
+            img.src = src
+        })
     }
 
     const fetchContributors = async (repoUrl: string) => {
-    if (!repoUrl) {
-        setContributors(sampleContributors.sampleContributors);
-        return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
-
-    try {
-        const [owner, repoName] = repoUrl.split('/');
-
-        if (!owner || !repoName) {
-            throw new Error("Invalid repository URL. Please use the format 'owner/repoName'.");
+        if (!repoUrl) {
+            setContributors(sampleContributors.sampleContributors);
+            return;
         }
 
-        const res = await fetch(`https://api.github.com/repos/${owner}/${repoName}/contributors?per_page=100`, {
-            headers: {
-                'Authorization': `Bearer ${GITHUB_TOKEN}`,
-            },
-        });
+        setIsLoading(true);
+        setError(null);
 
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+        const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+
+        try {
+            const [owner, repoName] = repoUrl.split('/');
+
+            if (!owner || !repoName) {
+                throw new Error("Invalid repository URL. Please use the format 'owner/repoName'.");
+            }
+
+            const res = await fetch(`https://api.github.com/repos/${owner}/${repoName}/contributors?per_page=100`, {
+                headers: {
+                    'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+            }
+
+            const data = await res.json();
+
+            const detailedContributors = await Promise.all(
+                data.map(async (contributor: { login: string; url: string; contributions: number; html_url: string }) => {
+                    const userRes = await fetch(contributor.url, {
+                        headers: {
+                            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+                        },
+                    });
+
+                    if (!userRes.ok) {
+                        throw new Error(`HTTP error! status: ${userRes.status} - ${userRes.statusText}`);
+                    }
+
+                    const userData = await userRes.json();
+                    return {
+                        login: contributor.login,
+                        avatar_url: userData.avatar_url,
+                        contributions: contributor.contributions,
+                        html_url: contributor.html_url,
+                        name: userData.name,
+                        bio: userData.bio,
+                        location: userData.location,
+                    };
+                })
+            );
+
+            setContributors(detailedContributors);
+        } catch (err) {
+            console.error('Error fetching contributors:', err);
+            setError('Failed to fetch contributors. Please check the repository URL and try again.');
+        } finally {
+            setIsLoading(false);
         }
-
-        const data = await res.json();
-
-        const detailedContributors = await Promise.all(
-            data.map(async (contributor: { login: string; url: string; contributions: number; html_url: string }) => {
-                const userRes = await fetch(contributor.url, {
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                    },
-                });
-
-                if (!userRes.ok) {
-                    throw new Error(`HTTP error! status: ${userRes.status} - ${userRes.statusText}`);
-                }
-
-                const userData = await userRes.json();
-                return {
-                    login: contributor.login,
-                    avatar_url: userData.avatar_url,
-                    contributions: contributor.contributions,
-                    html_url: contributor.html_url,
-                    name: userData.name,
-                    bio: userData.bio,
-                    location: userData.location,
-                };
-            })
-        );
-
-        setContributors(detailedContributors);
-    } catch (err) {
-        console.error('Error fetching contributors:', err);
-        setError('Failed to fetch contributors. Please check the repository URL and try again.');
-    } finally {
-        setIsLoading(false);
-    }
-};
+    };
 
 
     const embedImageCode = `<h1>Contributors' Wall</h1>

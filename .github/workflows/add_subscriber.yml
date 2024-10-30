@@ -1,0 +1,42 @@
+name: Add Subscriber
+
+on:
+  repository_dispatch:
+    types: [add_subscriber]
+
+jobs:
+  add-subscriber:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update subscribers list
+        env:
+          EMAIL: ${{ github.event.client_payload.email }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          # Fetch current gist content
+          GIST_CONTENT=$(curl -H "Authorization: token $GH_PAT" \
+                              -H "Accept: application/vnd.github.v3+json" \
+                              https://api.github.com/gists/$GIST_ID)
+          
+          # Extract current subscribers
+          SUBSCRIBERS=$(echo $GIST_CONTENT | jq -r '.files."subscribers.json".content')
+          
+          # Check if email already exists
+          if echo $SUBSCRIBERS | jq -e --arg email "$EMAIL" '.emailList | index($email)' > /dev/null; then
+            echo "Email already exists"
+            exit 0
+          fi
+          
+          # Add new email
+          NEW_CONTENT=$(echo $SUBSCRIBERS | jq --arg email "$EMAIL" '.emailList += [$email]')
+          
+          # Update gist
+          curl -X PATCH \
+               -H "Authorization: token $GH_PAT" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/gists/$GIST_ID \
+               -d "{\"files\":{\"subscribers.json\":{\"content\":$NEW_CONTENT}}}"
