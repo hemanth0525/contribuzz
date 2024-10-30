@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     // Send mail with defined transport object
     const info = await transporter.sendMail({
       from: `"Contri.buzz Feedback" <${process.env.SMTP_USER}>`,
-      to: "mail@contri.buzz", // Change to the desired recipient email
+      to: "mail@contri.buzz",
       subject: "New Feedback Submission",
       text: `Email: ${email}\n\nFeedback: ${feedback}`,
       html: `<p><strong>Email:</strong> ${email}</p><p><strong>Feedback:</strong> ${feedback}</p>`,

@@ -21,28 +21,38 @@ const Navbar = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/dispatches', {
+            const response = await fetch('/api/addSubscriber', {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    event_type: 'add_subscriber',
-                    client_payload: { email: email }
-                })
+                body: JSON.stringify({ email }),
             });
 
+            const responseText = await response.text();
+            console.log('Response Text:', responseText); // Log response text
+
+            // Attempt to parse the response as JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (error) {
+                console.error('Failed to parse JSON:', error);
+                setToast({ type: 'error', message: 'Failed to parse server response.' });
+                return;
+            }
+
             if (response.ok) {
-                setToast({ type: 'success', message: 'Thank you for subscribing! Please check your email to confirm.' });
+                setToast({ type: 'success', message: data.message });
                 setEmail('');
                 setTimeout(() => {
                     setIsNotifyOpen(false);
                 }, 3000);
             } else {
-                throw new Error('Failed to submit. Please try again.');
+                setToast({ type: 'warning', message: data.message });
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error adding subscriber:', error);
             setToast({ type: 'error', message: 'An error occurred. Please try again.' });
         } finally {
             setIsSubmitting(false);

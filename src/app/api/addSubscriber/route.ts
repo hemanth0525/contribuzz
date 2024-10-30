@@ -1,7 +1,7 @@
 // app/api/addSubscriber/route.ts
 
-const GITHUB_TOKEN = process.env.GIST_TOKEN; // Store your PAT securely as an environment variable
-const GIST_ID = process.env.GIST_ID; // Replace with your actual Gist ID
+const GITHUB_TOKEN = process.env.GIST_TOKEN;
+const GIST_ID = process.env.GIST_ID;
 
 export async function POST(req: Request) {
   const { email } = await req.json();
