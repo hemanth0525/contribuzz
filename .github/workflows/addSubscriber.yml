@@ -1,28 +1,34 @@
 name: Add Subscribers
 
 on:
-  workflow_dispatch:
-    inputs:
-      email:
-        description: "Email address to subscribe"
-        required: true
-        default: "test@example.com"
+  repository_dispatch:
+    types: [addSubscriber]
 
 jobs:
   subscribe:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Set up environment variables
         run: |
           echo "GIST_ID=${{ secrets.GIST_ID }}" >> $GITHUB_ENV
           echo "GIST_TOKEN=${{ secrets.GIST_TOKEN }}" >> $GITHUB_ENV
 
       - name: Add new subscriber
+        id: add_subscriber
         run: |
-          email="${{ github.event.inputs.email }}"
+          # Get email from the dispatch event
+          email="${{ github.event.client_payload.email }}"
+          
+          if [[ -z "$email" ]]; then
+            echo "::error::Email is required"
+            exit 1
+          fi
+
+          # Validate email format
+          if [[ ! "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+            echo "::error::Invalid email format"
+            exit 1
+          fi
 
           # Fetch the existing Gist content
           gist_response=$(curl -s -X GET "https://api.github.com/gists/$GIST_ID" \
@@ -31,44 +37,73 @@ jobs:
 
           # Extract the current email list
           if [[ $(echo "$gist_response" | jq -r '.files["subscribers.json"] | .content // empty') == "" ]]; then
-            echo "subscribers.json not found or is empty."
+            echo "Initializing new subscribers list"
             email_list="[]"
           else
             email_list=$(echo "$gist_response" | jq -r '.files["subscribers.json"].content | fromjson | .emailList')
           fi
 
-          # Convert existing email list to an array
-          email_array=($(echo "$email_list" | jq -r '.[]'))
-
           # Check if the email already exists
-          if [[ " ${email_array[@]} " =~ " $email " ]]; then
-            echo "Email already exists in the notification list."
+          if echo "$email_list" | jq -e --arg email "$email" 'index($email)' > /dev/null; then
+            echo "::error::Email already exists in the notification list"
             exit 1
           fi
 
           # Add the new email to the list
           updated_email_list=$(echo "$email_list" | jq --arg email "$email" '. += [$email]')
 
-          # Prepare the JSON payload for updating the Gist
-          payload=$(jq -n --argjson list "$updated_email_list" '{ emailList: $list }')
+          # Create the JSON payload with metadata
+          payload=$(jq -n \
+            --argjson list "$updated_email_list" \
+            --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            '{
+              emailList: $list,
+              lastUpdated: $timestamp,
+              totalSubscribers: ($list | length)
+            }')
 
-          # Prepare the content for subscribers.json as a string
-          content_string=$(echo "$payload" | jq '.')
-
-          # Properly escape the JSON string for the curl command
-          content_string_escaped=$(echo "$content_string" | jq -sRr @json | sed 's/^"\(.*\)"$/\1/')
+          # Prepare the content for subscribers.json
+          content_string=$(echo "$payload" | jq -c '.')
 
           # Update Gist with the new list
           response=$(curl -s -X PATCH "https://api.github.com/gists/$GIST_ID" \
             -H "Authorization: token $GIST_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Content-Type: application/json" \
-            -d "{\"files\": {\"subscribers.json\": {\"content\": \"$content_string_escaped\"}}}")
+            -d "{
+              \"files\": {
+                \"subscribers.json\": {
+                  \"content\": $content_string
+                }
+              }
+            }")
 
-          # Output response and subscription confirmation
-          echo "$response"
-          if [[ $(echo "$response" | jq -r '.message // empty') == "" ]]; then
-            echo "Thank you for subscribing!"
-          else
-            echo "Error: $(echo "$response" | jq -r '.message')"
+          # Check for errors in the response
+          if [[ $(echo "$response" | jq -r '.message // empty') != "" ]]; then
+            echo "::error::Failed to update subscribers list: $(echo "$response" | jq -r '.message')"
+            exit 1
           fi
+
+          # Set output variables
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "message=Successfully added $email to subscribers list" >> $GITHUB_OUTPUT
+          echo "total_subscribers=$(echo "$updated_email_list" | jq 'length')" >> $GITHUB_OUTPUT
+
+      - name: Create Issue Comment
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const outcome = steps.add_subscriber.outcome;
+            const outputs = steps.add_subscriber.outputs;
+            
+            const message = outcome === 'success'
+              ? `✅ ${outputs.message}\nTotal subscribers: ${outputs.total_subscribers}`
+              : `❌ Failed to add subscriber: ${steps.add_subscriber.error}`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.client_payload.issue_number,
+              body: message
+            });
