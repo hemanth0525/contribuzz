@@ -146,8 +146,8 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
 
             // Create a new canvas with the original dimensions
             const outputCanvas = document.createElement('canvas')
-            outputCanvas.width = canvas.width / scale
-            outputCanvas.height = canvas.height / scale
+            outputCanvas.width = canvas.width / 2
+            outputCanvas.height = canvas.height / 2
             const outputCtx = outputCanvas.getContext('2d')
 
             if (!outputCtx) {
@@ -161,7 +161,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
             // Draw the scaled-down image onto the output canvas
             outputCtx.drawImage(canvas, 0, 0, outputCanvas.width, outputCanvas.height)
 
-            const imageDataUrl = outputCanvas.toDataURL('image/png')
+            const imageDataUrl = outputCanvas.toDataURL('image/png', 0.7)
             console.log('Image data URL generated')
 
             const sanitizedFileName = `${repoUrl.replace(/\//g, '-')}.png`

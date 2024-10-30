@@ -1,3 +1,5 @@
+// app/api/save-wall-image/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
 import { RequestError } from "@octokit/request-error";
@@ -8,21 +10,24 @@ const GITHUB_OWNER = process.env.GITHUB_OWNER!;
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-async function getFileSha(filePath: string) {
+async function getFileSha(filePath: string): Promise<string | null> {
   try {
     const { data } = await octokit.repos.getContent({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: filePath,
     });
-    if ("sha" in data) {
-      return (data as { sha: string }).sha;
+
+    if (data && !Array.isArray(data) && data.type === "file") {
+      return data.sha;
     }
-    throw new Error("Unexpected response from GitHub API");
   } catch (error) {
-    if (error instanceof RequestError && error.status === 404) return null; // File does not exist
-    throw new Error(`GitHub API error (GET sha): ${(error as Error).message}`);
+    if (error instanceof RequestError && error.status === 404) {
+      return null; // File does not exist
+    }
+    throw error;
   }
+  return null; // Return null if no other return statement is hit
 }
 
 async function uploadToGitHub(fileName: string, imageDataUrl: string) {
@@ -35,8 +40,8 @@ async function uploadToGitHub(fileName: string, imageDataUrl: string) {
     repo: GITHUB_REPO,
     path: filePath,
     message: commitMessage,
-    content: imageDataUrl.split(",")[1], // Strip the base64 prefix
-    ...(sha && { sha }), // Only include `sha` if updating
+    content: imageDataUrl.split(",")[1], // Base64 content
+    ...(sha && { sha }), // Include `sha` if updating
   });
 
   return response.data.content?.html_url;
@@ -51,25 +56,19 @@ export async function POST(req: NextRequest) {
     }
 
     const url = await uploadToGitHub(fileName, imageDataUrl);
-    const response = NextResponse.json({ url });
-    response.headers.set("Access-Control-Allow-Origin", "*");
-    return response;
-  } catch (error) {
+    return NextResponse.json({ url });
+  } catch (error: unknown) {
     console.error("Error saving image:", error);
-    const errorMessage = (error as Error).message;
-    const response = NextResponse.json(
-      { error: `Failed to save image: ${errorMessage}` },
-      { status: 500 }
-    );
-    response.headers.set("Access-Control-Allow-Origin", "*");
-    return response;
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: `Failed to save image: ${error.message}` },
+        { status: 500 }
+      );
+    } else {
+      return NextResponse.json(
+        { error: "Failed to save image: Unknown error" },
+        { status: 500 }
+      );
+    }
   }
-}
-
-export async function OPTIONS() {
-  const response = NextResponse.json({});
-  response.headers.set("Access-Control-Allow-Origin", "*");
-  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  return response;
 }
