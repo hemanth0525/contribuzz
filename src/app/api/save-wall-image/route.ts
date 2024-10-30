@@ -1,5 +1,3 @@
-// app/api/save-wall-image/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "@octokit/rest";
 import { RequestError } from "@octokit/request-error";
@@ -35,12 +33,14 @@ async function uploadToGitHub(fileName: string, imageDataUrl: string) {
   const sha = await getFileSha(filePath);
   const commitMessage = sha ? `Update ${fileName}` : `Upload ${fileName}`;
 
+  // Decode the Base64 content before uploading
+  const content = imageDataUrl.split(",")[1]; // Get the Base64 part
   const response = await octokit.repos.createOrUpdateFileContents({
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
     path: filePath,
     message: commitMessage,
-    content: imageDataUrl.split(",")[1], // Base64 content
+    content, // Base64 content
     ...(sha && { sha }), // Include `sha` if updating
   });
 
@@ -51,10 +51,18 @@ export async function POST(req: NextRequest) {
   try {
     const { fileName, imageDataUrl } = await req.json();
 
+    // Validate file extension
     if (!fileName.endsWith(".png")) {
       throw new Error("File name must end with .png");
     }
 
+    // Validate that the imageDataUrl is a valid data URL
+    const isValidDataUrl = /^data:image\/png;base64,/.test(imageDataUrl);
+    if (!isValidDataUrl) {
+      throw new Error("Invalid image data URL");
+    }
+
+    // Upload the image and get the URL
     const url = await uploadToGitHub(fileName, imageDataUrl);
     return NextResponse.json({ url });
   } catch (error: unknown) {
