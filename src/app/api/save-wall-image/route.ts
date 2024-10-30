@@ -51,13 +51,25 @@ export async function POST(req: NextRequest) {
     }
 
     const url = await uploadToGitHub(fileName, imageDataUrl);
-    return NextResponse.json({ url });
+    const response = NextResponse.json({ url });
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
   } catch (error) {
     console.error("Error saving image:", error);
     const errorMessage = (error as Error).message;
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: `Failed to save image: ${errorMessage}` },
       { status: 500 }
     );
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    return response;
   }
+}
+
+export async function OPTIONS() {
+  const response = NextResponse.json({});
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  return response;
 }
