@@ -161,7 +161,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
             // Draw the scaled-down image onto the output canvas
             outputCtx.drawImage(canvas, 0, 0, outputCanvas.width, outputCanvas.height)
 
-            const imageDataUrl = outputCanvas.toDataURL('image/png', 0.7)
+            const imageDataUrl = outputCanvas.toDataURL('image/png', 0.5)
             console.log('Image data URL generated')
 
             const sanitizedFileName = `${repoUrl.replace(/\//g, '-')}.png`
