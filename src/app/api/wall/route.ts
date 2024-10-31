@@ -28,7 +28,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         }
 
         // Sanitize the repository name to create a valid file name
-        const sanitizedRepo = repo.replace("/", "-");
+        const sanitizedRepo = repo.replace("/", "-").toLowerCase();
         const fileName = onlyAvatars ? `${sanitizedRepo}(avatars).png` : `${sanitizedRepo}.jpg`;
         const imagePath = path.join(
             process.cwd(),

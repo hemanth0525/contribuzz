@@ -288,7 +288,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
             const fullWallImageDataUrl = compressImage(fullWallCanvas, 'image/jpeg', maxSize);
             const avatarWallImageDataUrl = compressImage(avatarWallCanvas, 'image/png', maxSize);
 
-            const sanitizedRepoName = repoUrl.replace(/\//g, '-');
+            const sanitizedRepoName = repoUrl.replace(/\//g, '-').toLowerCase();
             const fullWallFileName = `${sanitizedRepoName}.jpg`;
             const avatarWallFileName = `${sanitizedRepoName}(avatars).png`;
 
