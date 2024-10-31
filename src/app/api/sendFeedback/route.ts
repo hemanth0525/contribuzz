@@ -2,11 +2,17 @@
 
 import nodemailer from "nodemailer";
 
-export async function POST(req: Request) {
+/**
+ * Handles POST requests to send feedback via email.
+ *
+ * @param {Request} req - The incoming request object.
+ * @returns {Promise<Response>} - The response object indicating the result of the operation.
+ */
+export async function POST(req: Request): Promise<Response> {
   const { email, feedback } = await req.json();
 
   try {
-    // Create a transporter using Gmail SMTP
+    // Create a transporter using SMTP configuration from environment variables
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),

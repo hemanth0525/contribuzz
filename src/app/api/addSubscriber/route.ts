@@ -1,9 +1,11 @@
 // app/api/addSubscriber/route.ts
 
+// Retrieve GitHub token and Gist ID from environment variables
 const GITHUB_TOKEN = process.env.GIST_TOKEN;
 const GIST_ID = process.env.GIST_ID;
 
 export async function POST(req: Request) {
+  // Extract email from the request body
   const { email } = await req.json();
 
   try {
@@ -18,6 +20,7 @@ export async function POST(req: Request) {
       }
     );
 
+    // Check if the Gist fetch was successful
     if (!gistResponse.ok) {
       console.error("Failed to fetch Gist:", gistResponse.statusText);
       return new Response(
@@ -28,7 +31,7 @@ export async function POST(req: Request) {
 
     const gistData = await gistResponse.json();
 
-    // Parse existing email addresses from the Gist content
+    // Initialize email list from the Gist content
     let emailList = [];
     if (
       gistData.files["subscribers.json"] &&
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
       emailList = currentContent.emailList || [];
     }
 
-    // Check if the email already exists
+    // Check if the email already exists in the list
     if (emailList.includes(email)) {
       return new Response(
         JSON.stringify({
@@ -53,7 +56,7 @@ export async function POST(req: Request) {
     // Add new email to the list
     emailList.push(email);
 
-    // Update the Gist with the new list
+    // Update the Gist with the new email list
     await fetch(`https://api.github.com/gists/${GIST_ID}`, {
       method: "PATCH",
       headers: {
@@ -70,11 +73,13 @@ export async function POST(req: Request) {
       }),
     });
 
+    // Respond with a success message
     return new Response(
       JSON.stringify({ message: "Thank you for subscribing!" }),
       { status: 200 }
     );
   } catch (error) {
+    // Log and respond with an error message
     console.error("Error adding subscriber:", error);
     return new Response(
       JSON.stringify({ message: "An error occurred. Please try again." }),

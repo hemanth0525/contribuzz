@@ -4,45 +4,44 @@ import React, { useState } from "react";
 import ContributorsWall from "./ContributorsWall";
 import { X } from "lucide-react";
 
+// Hero component to display the main section of the page
 const Hero = () => {
+    // State to manage the repository input
     const [repo, setRepo] = useState("");
+    // State to manage the submitted repository
     const [submittedRepo, setSubmittedRepo] = useState("");
+    // State to manage error messages
     const [error, setError] = useState<string | null>(null);
+    // State to manage input focus
     const [isFocused, setIsFocused] = useState(false);
+    // State to manage the visibility of the error modal
     const [showErrorModal, setShowErrorModal] = useState(false);
 
+    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
 
-        const GITHUB_TOKEN = process.env.NEXT_PUBLIC_GITHUB_TOKEN
-
-
         try {
-            const [owner, repoName] = repo.split("/");
-            const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+            // Send a POST request to the server with the repository information
+            const response = await fetch('/api/githubRepo', {
+                method: 'POST',
                 headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`
-                }
-            })
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ repo })
+            });
 
+            // Check if the response is not ok
             if (!response.ok) {
-                // Logging the response for more detail
-                const errorData = await response.json();
-                console.error("Error Response Data:", errorData);
-
-                if (response.status === 404) {
-                    throw new Error(
-                        "Repository not found or not public. Please check the URL and try again!"
-                    );
-                } else {
-                    throw new Error(`Error ${response.status}: ${errorData.message}`);
-                }
+                throw new Error("Repository is either not available or not public. Please check the URL and try again.");
             }
 
+            // Update the submitted repository and clear the input
             setSubmittedRepo(repo);
             setRepo("");
         } catch (err) {
+            // Handle errors and show the error modal
             if (err instanceof Error) {
                 setError(err.message);
             } else {
@@ -51,7 +50,6 @@ const Hero = () => {
             setShowErrorModal(true);
         }
     };
-
 
     return (
         <div id="hero" className="bg-[#0d1117] text-[#c9d1d9] py-20">
@@ -78,7 +76,7 @@ const Hero = () => {
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
                                 required
-                                className="w-auto ml-2 py-1 px-1 bg-[#0d1117] border border-[#30363d] rounded-md text-[#c9d1d9] focus:outline-none focus:border-[#58a6ff] transition-colors"
+                                className="w-full sm:w-auto ml-2 py-1 px-1 bg-[#0d1117] border border-[#30363d] rounded-md text-[#c9d1d9] focus:outline-none focus:border-[#58a6ff] transition-colors"
                             />
                             <label
                                 htmlFor="repo"

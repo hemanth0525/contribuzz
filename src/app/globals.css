@@ -2,20 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-
-:root {
-  --foreground-rgb: 22, 27, 34;
-  --background-start-rgb: 13, 17, 23;
-  --background-middle-rgb: 22, 27, 34;
-  --background-end-rgb: 13, 17, 23;
+body {
+  overflow: hidden;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
-      transparent,
-      rgb(var(--background-middle-rgb)),
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+.os-scrollbar .os-scrollbar-handle {
+  background: linear-gradient(to right, #58a6ff, #3b82f6);
+  border-radius: 10px;
+}
+
+.os-scrollbar .os-scrollbar-handle:hover {
+  background: linear-gradient(to right, #58a6ff, #3b82f6);
+}
+
+.os-scrollbar .os-scrollbar-handle {
+  width: 8px;
 }
 
 @layer base {
@@ -33,22 +34,7 @@ body {
   }
 }
 
-@layer components {
-  .btn {
-    @apply px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-
-  .btn-primary {
-    @apply bg-cb-secondary text-white hover:bg-[#2ea043] focus:ring-cb-secondary;
-  }
-
-  .btn-secondary {
-    @apply bg-[#21262d] text-cb-text hover:bg-[#30363d] focus:ring-[#21262d];
-  }
-}
-
-/* Define custom selection style */
 ::selection {
   background: transparent;
-  color: theme('colors.cb-primary'); /* Text color on selection */
+  color: theme('colors.cb-primary');
 }
