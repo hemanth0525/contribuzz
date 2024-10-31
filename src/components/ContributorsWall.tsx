@@ -382,7 +382,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
     const embedImageCode = `<h1 align="center">Contributors' Wall</h1>
 
   <a href="https://github.com/github/gitignore/graphs/contributors">
-    <img src="https://contri.buzz?wall=${repo}" alt="Contributors' Wall for ${repo}" />
+    <img src="https://contri.buzz/api/wall?repo=${repo}" alt="Contributors' Wall for ${repo}" />
   </a>
 
 <p align="center">
@@ -393,7 +393,7 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
     const embedAvatarCode = `<h1 align="center">Contributors' Wall</h1>
 
   <a href="https://github.com/github/gitignore/graphs/contributors">
-    <img src="https://contri.buzz?wall=${repo}&onlyAvatars=true" alt="Contributors' Wall for ${repo}" />
+    <img src="https://contri.buzz/api/wall?repo=${repo}&onlyAvatars=true" alt="Contributors' Wall for ${repo}" />
   </a>
 
 <p align="center">
