@@ -381,24 +381,30 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
 
     const embedImageCode = `<h1 align="center">Contributors' Wall</h1>
 
-  <a href="https://github.com/github/gitignore/graphs/contributors">
-    <img src="https://contri.buzz/api/wall?repo=${repo}" alt="Contributors' Wall for ${repo}" />
-  </a>
+    <a href="https://github.com/${repo}/graphs/contributors">
+        <img src="https://contri.buzz/api/wall?repo=${repo}" alt="Contributors' Wall for ${repo}" />
+    </a>
 
-<p align="center">
-  Make your Contributors' Wall with <a href="https://contri.buzz/"><i>Contri.Buzz</i></a>
-</p>
+    <br />
+    <br />
+    
+    <p align="center">
+        Make your Contributors' Wall with <a href="https://contri.buzz/"><i>Contri.Buzz</i></a>
+    </p>
 `
 
     const embedAvatarCode = `<h1 align="center">Contributors' Wall</h1>
 
-  <a href="https://github.com/github/gitignore/graphs/contributors">
-    <img src="https://contri.buzz/api/wall?repo=${repo}&onlyAvatars=true" alt="Contributors' Wall for ${repo}" />
-  </a>
+    <a href="https://github.com/${repo}/graphs/contributors">
+        <img src="https://contri.buzz/api/wall?repo=${repo}&onlyAvatars=true" alt="Contributors' Wall for ${repo}" />
+    </a>
 
-<p align="center">
-  Make your Contributors' Wall with <a href="https://contri.buzz/"><i>Contri.Buzz</i></a>
-</p>
+    <br />
+    <br />
+
+    <p align="center">
+        Make your Contributors' Wall with <a href="https://contri.buzz/"><i>Contri.Buzz</i></a>
+    </p>
 `
 
     const handleNotifySubmit = async (e: React.FormEvent) => {
