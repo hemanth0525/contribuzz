@@ -91,7 +91,7 @@ const Footer = () => {
             </div>
 
             {/* Footer bottom text */}
-            <div className="mt-12 pt-8 border-t border-[#30363d] text-center">
+            <div className="my-4 md:mt-12 pt-8 border-t border-[#30363d] text-center">
                 <p className="text-sm text-[#8b949e]">
                     Made with ❤️ by the open-source community
                 </p>

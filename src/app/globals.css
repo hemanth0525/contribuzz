@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  overflow: hidden;
+  overscroll-behavior: none ;
 }
 
 .os-scrollbar .os-scrollbar-handle {

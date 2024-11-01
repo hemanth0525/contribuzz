@@ -491,11 +491,16 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
                             />
                         </div>
                         </div>
-                        <p className="text-xs sm:text-sm font-medium text-[#c9d1d9] text-center mt-2 break-words">
-                        {contributor.login}
-                        <span className="block text-xs text-[#8b949e]">
-                            {contributor.contributions}+
-                        </span>
+                        <p className="text-xs sm:text-sm font-medium text-[#c9d1d9] text-center mt-2">
+                            {contributor.login.split('').map((char, index) => (
+                                <React.Fragment key={index}>
+                                    {char}
+                                    {(index + 1) % 10 === 0 && <br />}
+                                </React.Fragment>
+                            ))}
+                            <span className="block text-xs text-[#8b949e]">
+                                {contributor.contributions}+
+                            </span>
                         </p>
                     </div>
                     ))}

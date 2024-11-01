@@ -44,7 +44,7 @@ export default function Home() {
             // Custom scrollbar styles can be added here
           },
         }}
-        style={{ height: '100vh' }} // Ensure the scrollbar covers the entire height
+        style={{ height: '100vh', overflow: 'hidden' }} // Ensure the scrollbar covers the entire height
       >
         <div className="relative min-h-screen bg-[#0d1117] overflow-hidden">
           {/* Large upward trending graph background */}
