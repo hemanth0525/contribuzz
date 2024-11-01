@@ -95,7 +95,7 @@ export default function Home() {
           </div>
 
           {/* Large Octocat overlay */}
-          <div className="fixed right-[-10vw] top-[20vh] w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] opacity-[0.03] pointer-events-none">
+          <div className="fixed right-[-10vw] top-[20vh] w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] opacity-[0.05] pointer-events-none">
             <svg
               viewBox="0 0 16 16"
               className="w-full h-full"
