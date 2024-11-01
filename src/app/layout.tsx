@@ -6,8 +6,6 @@ import "overlayscrollbars/overlayscrollbars.css";
 
 OverlayScrollbars.plugin(ClickScrollPlugin);
 
-export const runtime = 'edge';
-
 const inter = Inter({
   src: './fonts/Inter-VariableFont_opsz,wght.ttf',
   variable: '--font-inter',
