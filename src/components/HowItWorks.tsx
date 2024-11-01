@@ -19,7 +19,7 @@ const InnerCard = styled.div`
     text-align: center;
     position: relative;
     border-radius: 12px;
-    padding: 24px;
+    padding: 1.5rem;
 `
 
 interface OuterCardProps {
@@ -32,7 +32,7 @@ const OuterCard = styled.div<OuterCardProps>`
     --cursor-y: ${(props) => props.cursory};
     --cursor-x: ${(props) => props.cursorx};
     --glow-opacity: ${(props) => props.opacity};
-    width: 400px;
+    width: 100%;
     height: 100%;
     position: relative;
     padding: 1px;
@@ -61,8 +61,8 @@ const OuterCard = styled.div<OuterCardProps>`
 `
 
 const IconWrapper = styled.div`
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: 3rem;
+    margin-bottom: 1rem;
     color: #58a6ff;
 `
 
@@ -87,11 +87,11 @@ const HowItWorks = () => {
 
     return (
         <section id='how-it-works' className="pb-10 bg-[#0d1117] justify-center items-center">
-            <div className="container justity-center items-center mx-auto px-4">
+            <div className="container justify-center items-center mx-auto px-4">
                 <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3b82f6]">
                     How It Works
                 </h2>
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {steps.map((step, index) => (
                         <GlowingCard key={index} index={index} step={step} />
                     ))}

@@ -440,277 +440,277 @@ const ContributorsWall: React.FC<ContributorsWallProps> = ({ initialRepo }) => {
     return (
         <section id="contributors-wall" className="pt-10 bg-[#0d1117]">
             <div className="container mx-auto px-4">
-                <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3b82f6]">
-                    Contributors&apos; Wall
-                </h2>
-                <p className="text-center text-[#8b949e] mb-8">
-                    {repo ? (
-                        <>
-                            <span className="text-[#b9bcc0]">
-                                for <strong>{repo}</strong>
-                            </span>
-                            <br />
-                            <br />
-                            <span className="text-center text-[#8b949e] italic">
-                                <strong>Note:</strong> The actual wall you receive may differ slightly as it&apos;s optimized for GitHub <strong>README</strong> display.
-                            </span>
-                        </>
-                    ) : (
-                        <span className="text-[#8b949e]">
-                            <strong>Note:</strong> This is a sample wall generated for{" "}
-                            <strong>github/gitignore</strong> on <strong>27/10/2024</strong>.{" "}
-                            <br />
-                            Input your repo above and generate your new wall!
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3b82f6]">
+                Contributors&apos; Wall
+            </h2>
+            <p className="text-center text-[#8b949e] mb-8">
+                {repo ? (
+                <>
+                    <span className="text-[#b9bcc0]">
+                    for <strong>{repo}</strong>
+                    </span>
+                    <br />
+                    <br />
+                    <span className="text-center text-[#8b949e] italic">
+                    <strong>Note:</strong> The actual wall you receive may differ slightly as it&apos;s optimized for GitHub <strong>README</strong> display.
+                    </span>
+                </>
+                ) : (
+                <span className="text-[#8b949e]">
+                    <strong>Note:</strong> This is a sample wall generated for{" "}
+                    <strong>github/gitignore</strong> on <strong>27/10/2024</strong>.{" "}
+                    <br />
+                    Input your repo above and generate your new wall!
+                </span>
+                )}
+            </p>
+            {isLoading && (
+                <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#58a6ff]"></div>
+                </div>
+            )}
+            {error && (
+                <div className="bg-[#161b22] border-l-4 border-[#f85149] text-[#f85149] p-4 mb-8">
+                <p className="font-bold">Error</p>
+                <p>{error}</p>
+                </div>
+            )}
+            {!isLoading && !error && (
+                <>
+                <div ref={wallRef} className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-9 gap-4 mb-0.25">
+                    {contributors.slice(0, 100).map((contributor) => (
+                    <div key={contributor.login} className="flex flex-col items-center">
+                        <div className="avatar">
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#58a6ff] p-0.5">
+                            <Image
+                            src={contributor.avatar_url}
+                            alt={contributor.login}
+                            width={64}
+                            height={64}
+                            className="rounded-full"
+                            />
+                        </div>
+                        </div>
+                        <p className="text-xs sm:text-sm font-medium text-[#c9d1d9] text-center mt-2 break-words">
+                        {contributor.login}
+                        <span className="block text-xs text-[#8b949e]">
+                            {contributor.contributions}+
                         </span>
+                        </p>
+                    </div>
+                    ))}
+                </div>
+                <div className="text-center mt-4">
+                    <button
+                    onClick={
+                        !initialRepo
+                        ? () => scrollToSection("hero")
+                        : () => { setIsEmbedOpen(true); setActiveTab('fullWall'); }
+                    }
+                    className={`px-6 py-2 font-semibold rounded-md transition-colors inline-flex items-center gap-2 ${isWallSaved && initialRepo
+                        ? "bg-[#238636] text-white hover:bg-[#2ea043]"
+                        : !isWallSaved && initialRepo
+                        ? "bg-gray-500 text-gray-300 tooltip cursor-not-allowed"
+                        : "bg-gray-500 tooltip tooltip-warning text-gray-300 cursor-not-allowed"
+                        }`}
+                    data-tip={
+                        !initialRepo
+                        ? "Generate Your Wall First"
+                        : "Usually takes 10 - 20 seconds"
+                    }
+                    disabled={!isWallSaved && initialRepo !== ""}
+                    >
+                    <Users className="w-5 h-5" />
+                    {!isWallSaved && initialRepo
+                        ? "Saving Wall..."
+                        : "Embed / Integrate"}
+                    </button>
+                    {showToast && (
+                    <div className="toast toast-top toast-end px-4 py-2">
+                        <div className="alert alert-success">
+                        <div>
+                            <CheckCircleIcon className="w-6 h-6 mr-2" />
+                            <span>Wall saved successfully!</span>
+                        </div>
+                        </div>
+                    </div>
                     )}
-                </p>
-                {isLoading && (
-                    <div className="flex justify-center">
-                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#58a6ff]"></div>
-                    </div>
-                )}
-                {error && (
-                    <div className="bg-[#161b22] border-l-4 border-[#f85149] text-[#f85149] p-4 mb-8">
-                        <p className="font-bold">Error</p>
-                        <p>{error}</p>
-                    </div>
-                )}
-                {!isLoading && !error && (
-                    <>
-                        <div ref={wallRef} className="mx-32 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4 mb-0.25">
-                            {contributors.slice(0, 100).map((contributor) => (
-                                <div key={contributor.login} className="flex flex-col items-center">
-                                    <div className="avatar">
-                                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#58a6ff] p-0.5">
-                                            <Image
-                                                src={contributor.avatar_url}
-                                                alt={contributor.login}
-                                                width={64}
-                                                height={64}
-                                                className="rounded-full"
-                                            />
-                                        </div>
-                                    </div>
-                                    <p className="text-xs sm:text-sm font-medium text-[#c9d1d9] text-center mt-2 break-words">
-                                        {contributor.login}
-                                        <span className="block text-xs text-[#8b949e]">
-                                            {contributor.contributions}+
-                                        </span>
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="text-center">
-                            <button
-                                onClick={
-                                    !initialRepo
-                                        ? () => scrollToSection("hero")
-                                        : () => { setIsEmbedOpen(true); setActiveTab('fullWall'); }
-                                }
-                                className={`px-6 py-2 font-semibold rounded-md transition-colors inline-flex items-center gap-2 ${isWallSaved && initialRepo
-                                    ? "bg-[#238636] text-white hover:bg-[#2ea043]"
-                                    : !isWallSaved && initialRepo
-                                        ? "bg-gray-500 text-gray-300 tooltip cursor-not-allowed"
-                                        : "bg-gray-500 tooltip tooltip-warning text-gray-300 cursor-not-allowed"
-                                    }`}
-                                data-tip={
-                                    !initialRepo
-                                        ? "Generate Your Wall First"
-                                        : "Usually takes 10 - 20 seconds"
-                                }
-                                disabled={!isWallSaved && initialRepo !== ""}
-                            >
-                                <Users className="w-5 h-5" />
-                                {!isWallSaved && initialRepo
-                                    ? "Saving Wall..."
-                                    : "Embed / Integrate"}
-                            </button>
-                            {showToast && (
-                                <div className="toast toast-top toast-end px-4 py-2">
-                                    <div className="alert alert-success">
-                                        <div>
-                                            <CheckCircleIcon className="w-6 h-6 mr-2" />
-                                            <span>Wall saved successfully!</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
+                </div>
+                </>
+            )}
             </div>
 
             {isEmbedOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setIsEmbedOpen(false)}>
-                    <div className="bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-bold text-[#c9d1d9]">Embed Contributors&apos; Wall</h3>
-                            <button onClick={() => setIsEmbedOpen(false)} className="text-[#8b949e] hover:text-[#c9d1d9]">
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-4 mb-6">
-                            <button
-                                className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'fullWall'
-                                    ? 'bg-[#238636] text-white shadow-lg transform scale-105'
-                                    : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
-                                    }`}
-                                onClick={() => setActiveTab('fullWall')}
-                            >
-                                <ImageIcon className="w-5 h-5 inline-block mr-2" />
-                                Full Wall
-                            </button>
-                            <button
-                                className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'avatarWall'
-                                    ? 'bg-[#238636] text-white shadow-lg transform scale-105'
-                                    : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
-                                    }`}
-                                onClick={() => setActiveTab('avatarWall')}
-                            >
-                                <Users className="w-5 h-5 inline-block mr-2" />
-                                Avatar Wall
-                            </button>
-                            <button
-                                className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'interactive'
-                                    ? 'bg-[#238636] text-white shadow-lg transform scale-105'
-                                    : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
-                                    }`}
-                                onClick={() => setActiveTab('interactive')}
-                            >
-                                <Code className="w-5 h-5 inline-block mr-2" />
-                                Interactive
-                            </button>
-                        </div>
-                        {activeTab === 'fullWall' && (
-                            <div>
-                                <p className="mb-4 text-[#8b949e]">
-                                    We highly recommend revisiting and regenerating the wall at least once a week. No need to change the previously used embed code; we will update the same URL with the latest data!
-                                </p>
-                                <ul className="list-disc list-inside text-[#8b949e]">
-                                    <li>Usernames and contributions count</li>
-                                    <li>Profile pictures</li>
-                                    <li>Optimized for GitHub README display</li>
-                                    <li>GitHub Dark Default theme background</li>
-                                </ul>
-                                <div className="relative bg-[#0d1117] p-4 rounded-md mt-4 mb-4 border border-[#30363d]">
-                                    <code className="text-sm whitespace-pre-wrap text-[#c9d1d9]">
-                                        {embedImageCode}
-                                    </code>
-                                    <button
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(embedImageCode)
-                                            setCopied(true)
-                                            setTimeout(() => setCopied(false), 2000)
-                                        }}
-                                        className="absolute top-2 right-2 px-2 py-1 bg-[#21262d] text-[#c9d1d9] rounded-md hover:bg-[#30363d] transition-colors"
-                                    >
-                                        {copied ? <CopyCheck width={20} height={20} /> : <Copy width={20} height={20} />}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === 'avatarWall' && (
-                            <div>
-                                <p className="mb-4 text-[#8b949e]">
-                                    We highly recommend revisiting and regenerating the wall at least once a week. No need to change the previously used embed code; we will update the same URL with the latest data!
-                                </p>
-                                <ul className="list-disc list-inside text-[#8b949e]">
-                                    <li>Profile pictures</li>
-                                    <li>Optimized for GitHub README display</li>
-                                    <li>Transparent background</li>
-                                </ul>
-                                <div className="relative bg-[#0d1117] p-4 rounded-md mt-4 mb-4 border border-[#30363d]">
-                                    <code className="text-sm whitespace-pre-wrap text-[#c9d1d9]">
-                                        {embedAvatarCode}
-                                    </code>
-                                    <button
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(embedAvatarCode)
-                                            setCopied(true)
-                                            setTimeout(() => setCopied(false), 2000)
-                                        }}
-                                        className="absolute top-2 right-2 px-2 py-1 bg-[#21262d] text-[#c9d1d9] rounded-md hover:bg-[#30363d] transition-colors"
-                                    >
-                                        {copied ? <CopyCheck width={20} height={20} /> : <Copy width={20} height={20} />}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        {activeTab === 'interactive' && (
-                            <div className="bg-[#0d1117] rounded-lg p-6 border border-[#30363d]">
-                                <p className="text-[#8b949e] mb-6">
-                                    We&apos;re excited to announce that an interactive wall feature is in the works! This new feature will allow you to engage with contributors in real-time, explore their profiles, and celebrate their contributions in a dynamic and immersive way.
-                                </p>
-                                <p className="text-[#8b949e] mb-6">
-                                    Stay tuned for updates and be the first to experience this innovative addition to our platform. We appreciate your support and enthusiasm as we continue to enhance the Contributors&apos; Wall.
-                                </p>
-                                <p className="text-[#8b949e] mb-6">
-                                    We would love to hear your feedback and suggestions. Please consider sponsoring us to support ongoing development and improvements. Your contributions make a significant difference!
-                                </p>
-                                <p className="text-[#8b949e] mb-6">
-                                    Sign up to get notified about the latest updates and new features. Thank you for being a part of our community and helping us bring this vision to life!
-                                </p>
-                                <form onSubmit={handleNotifySubmit} className="flex flex-col gap-4 sm:flex-row items-center mt-4 w-full">
-                                    <div className="relative flex-grow">
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            className="w-full px-3 py-2 bg-cb-bg-light border border-cb-border rounded-md text-cb-text focus:border-cb-primary transition-colors"
-                                            required
-                                        />
-                                        <label
-                                            htmlFor="email"
-                                            className={`absolute left-3 transition-all cursor-text duration-200 ${isFocused || email ? '-top-2.5 text-xs bg-cb-bg-light px-1 text-cb-primary' : 'top-2 text-cb-text-muted'}`}
-                                        >
-                                            Enter your email
-                                        </label>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            type="submit"
-                                            className="flex px-3 py-2 text-sm font-medium bg-[#238636] text-white rounded-md hover:bg-[#2ea043] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#238636]"
-                                            disabled={isSubmitting}
-                                        >
-                                            {isSubmitting ? 'Submitting...' : 'Notify Me'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setIsFocused(false);
-                                            }}
-                                            className="flex-1 px-3 py-2 text-sm font-medium bg-[#21262d] text-cb-text rounded-md hover:bg-[#30363d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#21262d]"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-                    </div>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setIsEmbedOpen(false)}>
+                <div className="bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold text-[#c9d1d9]">Embed Contributors&apos; Wall</h3>
+                    <button onClick={() => setIsEmbedOpen(false)} className="text-[#8b949e] hover:text-[#c9d1d9]">
+                    <X className="w-6 h-6" />
+                    </button>
                 </div>
+                <div className="flex flex-wrap gap-4 mb-6">
+                    <button
+                    className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'fullWall'
+                        ? 'bg-[#238636] text-white shadow-lg transform scale-105'
+                        : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
+                        }`}
+                    onClick={() => setActiveTab('fullWall')}
+                    >
+                    <ImageIcon className="w-5 h-5 inline-block mr-2" />
+                    Full Wall
+                    </button>
+                    <button
+                    className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'avatarWall'
+                        ? 'bg-[#238636] text-white shadow-lg transform scale-105'
+                        : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
+                        }`}
+                    onClick={() => setActiveTab('avatarWall')}
+                    >
+                    <Users className="w-5 h-5 inline-block mr-2" />
+                    Avatar Wall
+                    </button>
+                    <button
+                    className={`flex-1 py-3 px-4 rounded-md transition-all ${activeTab === 'interactive'
+                        ? 'bg-[#238636] text-white shadow-lg transform scale-105'
+                        : 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
+                        }`}
+                    onClick={() => setActiveTab('interactive')}
+                    >
+                    <Code className="w-5 h-5 inline-block mr-2" />
+                    Interactive
+                    </button>
+                </div>
+                {activeTab === 'fullWall' && (
+                    <div>
+                    <p className="mb-4 text-[#8b949e]">
+                        We highly recommend revisiting and regenerating the wall at least once a week. No need to change the previously used embed code; we will update the same URL with the latest data!
+                    </p>
+                    <ul className="list-disc list-inside text-[#8b949e]">
+                        <li>Usernames and contributions count</li>
+                        <li>Profile pictures</li>
+                        <li>Optimized for GitHub README display</li>
+                        <li>GitHub Dark Default theme background</li>
+                    </ul>
+                    <div className="relative bg-[#0d1117] p-4 rounded-md mt-4 mb-4 border border-[#30363d]">
+                        <code className="text-sm whitespace-pre-wrap text-[#c9d1d9]">
+                        {embedImageCode}
+                        </code>
+                        <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(embedImageCode)
+                            setCopied(true)
+                            setTimeout(() => setCopied(false), 2000)
+                        }}
+                        className="absolute top-2 right-2 px-2 py-1 bg-[#21262d] text-[#c9d1d9] rounded-md hover:bg-[#30363d] transition-colors"
+                        >
+                        {copied ? <CopyCheck width={20} height={20} /> : <Copy width={20} height={20} />}
+                        </button>
+                    </div>
+                    </div>
+                )}
+                {activeTab === 'avatarWall' && (
+                    <div>
+                    <p className="mb-4 text-[#8b949e]">
+                        We highly recommend revisiting and regenerating the wall at least once a week. No need to change the previously used embed code; we will update the same URL with the latest data!
+                    </p>
+                    <ul className="list-disc list-inside text-[#8b949e]">
+                        <li>Profile pictures</li>
+                        <li>Optimized for GitHub README display</li>
+                        <li>Transparent background</li>
+                    </ul>
+                    <div className="relative bg-[#0d1117] p-4 rounded-md mt-4 mb-4 border border-[#30363d]">
+                        <code className="text-sm whitespace-pre-wrap text-[#c9d1d9]">
+                        {embedAvatarCode}
+                        </code>
+                        <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(embedAvatarCode)
+                            setCopied(true)
+                            setTimeout(() => setCopied(false), 2000)
+                        }}
+                        className="absolute top-2 right-2 px-2 py-1 bg-[#21262d] text-[#c9d1d9] rounded-md hover:bg-[#30363d] transition-colors"
+                        >
+                        {copied ? <CopyCheck width={20} height={20} /> : <Copy width={20} height={20} />}
+                        </button>
+                    </div>
+                    </div>
+                )}
+                {activeTab === 'interactive' && (
+                    <div className="bg-[#0d1117] rounded-lg p-6 border border-[#30363d]">
+                    <p className="text-[#8b949e] mb-6">
+                        We&apos;re excited to announce that an interactive wall feature is in the works! This new feature will allow you to engage with contributors in real-time, explore their profiles, and celebrate their contributions in a dynamic and immersive way.
+                    </p>
+                    <p className="text-[#8b949e] mb-6">
+                        Stay tuned for updates and be the first to experience this innovative addition to our platform. We appreciate your support and enthusiasm as we continue to enhance the Contributors&apos; Wall.
+                    </p>
+                    <p className="text-[#8b949e] mb-6">
+                        We would love to hear your feedback and suggestions. Please consider sponsoring us to support ongoing development and improvements. Your contributions make a significant difference!
+                    </p>
+                    <p className="text-[#8b949e] mb-6">
+                        Sign up to get notified about the latest updates and new features. Thank you for being a part of our community and helping us bring this vision to life!
+                    </p>
+                    <form onSubmit={handleNotifySubmit} className="flex flex-col gap-4 sm:flex-row items-center mt-4 w-full">
+                        <div className="relative flex-grow">
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            className="w-full px-3 py-2 bg-cb-bg-light border border-cb-border rounded-md text-cb-text focus:border-cb-primary transition-colors"
+                            required
+                        />
+                        <label
+                            htmlFor="email"
+                            className={`absolute left-3 transition-all cursor-text duration-200 ${isFocused || email ? '-top-2.5 text-xs bg-cb-bg-light px-1 text-cb-primary' : 'top-2 text-cb-text-muted'}`}
+                        >
+                            Enter your email
+                        </label>
+                        </div>
+                        <div className="flex gap-2">
+                        <button
+                            type="submit"
+                            className="flex px-3 py-2 text-sm font-medium bg-[#238636] text-white rounded-md hover:bg-[#2ea043] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#238636]"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Submitting...' : 'Notify Me'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                            setIsFocused(false);
+                            }}
+                            className="flex-1 px-3 py-2 text-sm font-medium bg-[#21262d] text-cb-text rounded-md hover:bg-[#30363d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#21262d]"
+                        >
+                            Cancel
+                        </button>
+                        </div>
+                    </form>
+                    </div>
+                )}
+                </div>
+            </div>
             )}
             <AnimatePresence>
-                {toast && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        className="fixed top-4 right-4 z-50"
-                    >
-                        <div className={`p-4 rounded-md shadow-lg ${toast.type === 'success' ? 'bg-green-500' :
-                            toast.type === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-                            } text-white flex items-center`}>
-                            {toast.type === 'success' ? <CheckCircleIcon className="w-6 h-6 mr-2" /> :
-                                toast.type === 'warning' ? <CircleAlert className="w-6 h-6 mr-2" /> :
-                                    <CircleX className="w-6 h-6 mr-2" />}
-                            <span>{toast.message}</span>
-                        </div>
-                    </motion.div>
-                )}
+            {toast && (
+                <motion.div
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                className="fixed top-4 right-4 z-50"
+                >
+                <div className={`p-4 rounded-md shadow-lg ${toast.type === 'success' ? 'bg-green-500' :
+                    toast.type === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                    } text-white flex items-center`}>
+                    {toast.type === 'success' ? <CheckCircleIcon className="w-6 h-6 mr-2" /> :
+                    toast.type === 'warning' ? <CircleAlert className="w-6 h-6 mr-2" /> :
+                        <CircleX className="w-6 h-6 mr-2" />}
+                    <span>{toast.message}</span>
+                </div>
+                </motion.div>
+            )}
             </AnimatePresence>
         </section>
     );
