@@ -1,11 +1,15 @@
+// RootLayout.tsx
 import './globals.css'
 import Inter from 'next/font/local'
 import { Analytics } from '@vercel/analytics/react'
-import { OverlayScrollbars, ClickScrollPlugin } from "overlayscrollbars";
-import "overlayscrollbars/overlayscrollbars.css";
+import PullToRefresh from '@/components/PullToRefresh'
+import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars'
+import 'overlayscrollbars/overlayscrollbars.css'
 
-OverlayScrollbars.plugin(ClickScrollPlugin);
+// Activate the OverlayScrollbars plugin
+OverlayScrollbars.plugin(ClickScrollPlugin)
 
+// Define the Inter font
 const inter = Inter({
   src: './fonts/Inter-VariableFont_opsz,wght.ttf',
   variable: '--font-inter',
@@ -20,10 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <div className="scroll-container">
-          {children}
-          <Analytics />
-        </div>
+        <PullToRefresh>
+          <div className="scroll-container">
+            {children}
+            <Analytics />
+          </div>
+        </PullToRefresh>
       </body>
     </html>
   )
