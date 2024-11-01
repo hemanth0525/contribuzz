@@ -26,12 +26,48 @@ const generateDots = (count: number) => {
 
 // Home component serves as the main page of the application
 export default function Home() {
-  const [dots, setDots] = useState<{ left: string; top: string; animationDelay: string; animationDuration: string; }[]>([]); // Start with an empty array
-  const osRef = useRef(null); // Reference for OverlayScrollbars
+  const [dots, setDots] = useState<{ left: string; top: string; animationDelay: string; animationDuration: string; }[]>([]);
+  const osRef = useRef<OverlayScrollbarsComponent>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStartY = useRef(0);
+  const isMobile = useRef(false);
 
   useEffect(() => {
-    setDots(generateDots(20)); // Generate dots on client mount
+    setDots(generateDots(20));
+    isMobile.current = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isMobile.current && osRef.current?.osInstance()?.scroll().position.y === 0) {
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isMobile.current && osRef.current?.osInstance()?.scroll().position.y === 0) {
+      const touchY = e.touches[0].clientY;
+      const pull = touchY - touchStartY.current;
+      if (pull > 0) {
+        e.preventDefault();
+        setPullDistance(Math.min(pull, 100));
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isMobile.current && pullDistance > 50) {
+      setRefreshing(true);
+      // Simulate refresh
+      setTimeout(() => {
+        setDots(generateDots(20));
+        setRefreshing(false);
+        setPullDistance(0);
+      }, 1000);
+    } else {
+      setPullDistance(0);
+    }
+  };
 
   return (
     <div lang="en" className={inter.variable}>
@@ -39,14 +75,30 @@ export default function Home() {
         ref={osRef}
         options={{
           scrollbars: {
-            autoHide: 'leave', // Hide scrollbar on mouse leave
-            theme: 'os-theme-light', // Use a light theme for the scrollbar
-            // Custom scrollbar styles can be added here
+            autoHide: 'leave',
+            theme: 'os-theme-light',
           },
         }}
-        style={{ height: '100vh'}} // Ensure the scrollbar covers the entire height
+        style={{ height: '100vh', overflow: 'hidden' }}
       >
-        <div className="relative min-h-screen bg-[#0d1117] overflow-hidden">
+        <div
+          className="relative min-h-screen bg-[#0d1117] overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Pull-to-refresh indicator */}
+          <div
+            className="absolute top-0 left-0 w-full flex justify-center items-center text-[#58a6ff] text-sm z-50 pointer-events-none"
+            style={{
+              height: `${pullDistance}px`,
+              opacity: pullDistance / 100,
+              transition: 'height 0.2s ease-out, opacity 0.2s ease-out'
+            }}
+          >
+            {refreshing ? 'Refreshing...' : 'Pull to refresh'}
+          </div>
+
           {/* Large upward trending graph background */}
           <div
             className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"

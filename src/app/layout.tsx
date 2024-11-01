@@ -2,7 +2,6 @@
 import './globals.css'
 import Inter from 'next/font/local'
 import { Analytics } from '@vercel/analytics/react'
-import PullToRefresh from '@/components/PullToRefresh'
 import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars'
 import 'overlayscrollbars/overlayscrollbars.css'
 
@@ -24,12 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <body>
-        <PullToRefresh>
           <div className="scroll-container">
             {children}
             <Analytics />
           </div>
-        </PullToRefresh>
       </body>
     </html>
   )
