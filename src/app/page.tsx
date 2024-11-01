@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-react';
+import { useState, useEffect } from 'react';
+import PullToRefreshWrapper from '@/components/PullToRefreshWrapper';
 import Hero from '@/components/Hero';
 import HowItWorks from '@/components/HowItWorks';
 import Inter from 'next/font/local';
@@ -27,78 +27,21 @@ const generateDots = (count: number) => {
 // Home component serves as the main page of the application
 export default function Home() {
   const [dots, setDots] = useState<{ left: string; top: string; animationDelay: string; animationDuration: string; }[]>([]);
-  const osRef = useRef<OverlayScrollbarsComponent>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStartY = useRef(0);
-  const isMobile = useRef(false);
 
   useEffect(() => {
     setDots(generateDots(20));
-    isMobile.current = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   }, []);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (isMobile.current && osRef.current?.osInstance()?.scroll().position.y === 0) {
-      touchStartY.current = e.touches[0].clientY;
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isMobile.current && osRef.current?.osInstance()?.scroll().position.y === 0) {
-      const touchY = e.touches[0].clientY;
-      const pull = touchY - touchStartY.current;
-      if (pull > 0) {
-        e.preventDefault();
-        setPullDistance(Math.min(pull, 100));
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (isMobile.current && pullDistance > 50) {
-      setRefreshing(true);
-      // Simulate refresh
-      setTimeout(() => {
-        setDots(generateDots(20));
-        setRefreshing(false);
-        setPullDistance(0);
-      }, 1000);
-    } else {
-      setPullDistance(0);
-    }
+  const handleRefresh = async () => {
+    // Simulate an asynchronous refresh operation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setDots(generateDots(20));
   };
 
   return (
     <div lang="en" className={inter.variable}>
-      <OverlayScrollbarsComponent
-        ref={osRef}
-        options={{
-          scrollbars: {
-            autoHide: 'leave',
-            theme: 'os-theme-light',
-          },
-        }}
-        style={{ height: '100vh', overflow: 'hidden' }}
-      >
-        <div
-          className="relative min-h-screen bg-[#0d1117] overflow-hidden"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Pull-to-refresh indicator */}
-          <div
-            className="absolute top-0 left-0 w-full flex justify-center items-center text-[#58a6ff] text-sm z-50 pointer-events-none"
-            style={{
-              height: `${pullDistance}px`,
-              opacity: pullDistance / 100,
-              transition: 'height 0.2s ease-out, opacity 0.2s ease-out'
-            }}
-          >
-            {refreshing ? 'Refreshing...' : 'Pull to refresh'}
-          </div>
-
+      <PullToRefreshWrapper onRefresh={handleRefresh}>
+        <div className="relative min-h-screen bg-[#0d1117] overflow-hidden">
           {/* Large upward trending graph background */}
           <div
             className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none"
@@ -187,7 +130,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </OverlayScrollbarsComponent>
+      </PullToRefreshWrapper>
     </div>
   );
 }
