@@ -161,18 +161,18 @@ const Navbar = () => {
                             transition={{ duration: 0.3 }}
                             className="md:hidden mt-4"
                         >
-                            <div className="flex flex-col space-y-2">
-                                <button onClick={() => scrollToSection('contributors-wall')} className="text-cb-text hover:text-cb-primary py-2">
+                            <div className="flex flex-col space-y-2 items-center">
+                                <button onClick={() => scrollToSection('contributors-wall')} className="text-cb-text hover:text-cb-primary py-2 w-full text-center">
                                     Contributors&apos; Wall
                                 </button>
-                                <button onClick={() => scrollToSection('how-it-works')} className="text-cb-text hover:text-cb-primary py-2">
+                                <button onClick={() => scrollToSection('how-it-works')} className="text-cb-text hover:text-cb-primary py-2 w-full text-center">
                                     How It Works
                                 </button>
                                 <a
                                     href="https://github.com/sponsors/hemanth0525"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-cb-text hover:text-cb-primary py-2 flex items-center"
+                                    className="text-cb-text hover:text-cb-primary py-2 w-full text-center flex items-center justify-center"
                                 >
                                     <Heart className="w-4 h-4 mr-2 text-[#db61a2]" />
                                     Sponsor
@@ -182,7 +182,7 @@ const Navbar = () => {
                                         setIsNotifyOpen(true);
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="text-cb-text hover:text-cb-primary py-2 flex items-center"
+                                    className="text-cb-text hover:text-cb-primary py-2 w-full text-center flex items-center justify-center"
                                 >
                                     <svg aria-hidden="true" height="16" viewBox="0 0 16 16" width="16" data-view-component="true" className="mr-2" fill="none" stroke="#db61a2" strokeWidth="1.5">
                                         <rect x="1" y="3" width="14" height="10" rx="1" ry="1" />
@@ -195,7 +195,7 @@ const Navbar = () => {
                                         setIsFeedbackOpen(true);
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="text-cb-text hover:text-cb-primary py-2 flex items-center"
+                                    className="text-cb-text hover:text-cb-primary py-2 w-full text-center flex items-center justify-center"
                                 >
                                     <svg aria-hidden="true" height="16" viewBox="0 0 16 16" width="16" data-view-component="true" className="mr-2" fill="none" stroke="#db61a2" strokeWidth="1.5">
                                         <rect x="3" y="1" width="12" height="14" rx="1" ry="1" />

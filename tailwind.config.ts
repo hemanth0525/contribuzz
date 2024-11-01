@@ -16,6 +16,7 @@ module.exports = {
       },
       animation: {
         "gradient-wave": "wave 3s linear infinite",
+        'spin-reverse': 'spin 1s linear infinite reverse',
       },
       colors: {
         "cb-bg": "#0d1117",

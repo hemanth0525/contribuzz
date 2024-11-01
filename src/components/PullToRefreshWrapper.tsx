@@ -9,6 +9,14 @@ interface PullToRefreshWrapperProps {
     onRefresh: () => Promise<void>;
 }
 
+const GradientSpinner: React.FC = () => (
+    <div className="relative w-8 h-8">
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#58a6ff] animate-spin"></div>
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-r-[#58a6ff] animate-spin-reverse"></div>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#58a6ff] to-transparent opacity-30 animate-pulse"></div>
+    </div>
+);
+
 const PullToRefreshWrapper: React.FC<PullToRefreshWrapperProps> = ({ children, onRefresh }) => {
     const osRef = useRef<OverlayScrollbarsComponentRef>(null);
     const [refreshing, setRefreshing] = useState(false);
@@ -69,14 +77,21 @@ const PullToRefreshWrapper: React.FC<PullToRefreshWrapperProps> = ({ children, o
             >
                 {/* Pull-to-refresh indicator */}
                 <div
-                    className="absolute top-0 left-0 w-full flex justify-center items-center text-[#58a6ff] text-sm z-50 pointer-events-none"
+                    className="absolute top-0 left-0 w-full flex flex-col justify-center items-center text-[#58a6ff] text-sm z-50 pointer-events-none"
                     style={{
                         height: `${pullDistance}px`,
                         opacity: pullDistance / 100,
                         transition: 'height 0.2s ease-out, opacity 0.2s ease-out'
                     }}
                 >
-                    {refreshing ? 'Refreshing...' : 'Pull to refresh'}
+                    {refreshing ? (
+                        <>
+                            <GradientSpinner />
+                            <span className="mt-2">Refreshing...</span>
+                        </>
+                    ) : (
+                        <span>{pullDistance > 50 ? 'Release to refresh' : 'Pull to refresh'}</span>
+                    )}
                 </div>
                 {children}
             </div>
