@@ -1,7 +1,6 @@
 // RootLayout.tsx
 import './globals.css'
 import Inter from 'next/font/local'
-import { Analytics } from '@vercel/analytics/react'
 import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars'
 import 'overlayscrollbars/overlayscrollbars.css'
 
@@ -25,7 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
           <div className="scroll-container">
             {children}
-            <Analytics />
           </div>
       </body>
     </html>
