@@ -1,8 +1,6 @@
 // app/api/wall/route.ts
 
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 
 /**
  * Handles GET requests to fetch an image based on the provided repository name.
@@ -27,27 +25,19 @@ export async function GET(req: Request): Promise<NextResponse> {
             );
         }
 
-        // Sanitize the repository name to create a valid file name
+        // Construct the jsDelivr URL for the images
         const sanitizedRepo = repo.replace("/", "-").toLowerCase();
         const fileName = onlyAvatars ? `${sanitizedRepo}(avatars).png` : `${sanitizedRepo}.jpg`;
-        const imagePath = path.join(
-            process.cwd(),
-            "public",
-            "walls",
-            fileName
-        );
+        const jsDelivrUrl = `https://cdn.jsdelivr.net/gh/hemanth0525/contribuzz/public/walls/${fileName}`;
 
-        console.log(`Checking if image exists at path: ${imagePath}`);
+        console.log(`Redirecting to jsDelivr URL: ${jsDelivrUrl}`);
 
-        // Check if the image exists
-        if (fs.existsSync(imagePath)) {
-            const absoluteUrl = `${new URL(req.url).protocol}//${req.headers.get(
-                "host"
-            )}/walls/${fileName}`;
-            console.log(`Image found, redirecting to ${absoluteUrl}`);
-            return NextResponse.redirect(absoluteUrl);
+        // Check if the image exists on jsDelivr
+        const response = await fetch(jsDelivrUrl, { method: 'HEAD' });
+        if (response.ok) {
+            return NextResponse.redirect(jsDelivrUrl);
         } else {
-            console.log("Image not found");
+            console.log("Image not found on jsDelivr");
             return NextResponse.json({ error: "Image not found" }, { status: 404 });
         }
     } catch (error: unknown) {
