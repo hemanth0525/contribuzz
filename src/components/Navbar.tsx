@@ -79,14 +79,11 @@ const Navbar = () => {
     }, [toast])
 
     const scrollToSection = (id: string) => {
-        const section = document.getElementById(id)
+        const section = document.getElementById(id);
         if (section) {
-            const yOffset = -80;
-            const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: 'smooth' });
+            section.scrollIntoView({ behavior: "smooth" });
         }
-        setIsMobileMenuOpen(false)
-    }
+    };
 
     return (
         <nav className="bg-cb-bg border-b border-cb-border py-4">
