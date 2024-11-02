@@ -81,7 +81,9 @@ const Navbar = () => {
     const scrollToSection = (id: string) => {
         const section = document.getElementById(id)
         if (section) {
-            section.scrollIntoView({ behavior: 'smooth' })
+            const yOffset = -80;
+            const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
         }
         setIsMobileMenuOpen(false)
     }
@@ -211,6 +213,7 @@ const Navbar = () => {
                 </AnimatePresence>
             </div>
 
+            {/* Notify and Feedback modals */}
             <AnimatePresence>
                 {(isNotifyOpen || isFeedbackOpen) && (
                     <motion.div
@@ -345,6 +348,7 @@ const Navbar = () => {
                 )}
             </AnimatePresence>
 
+            {/* Toast notifications */}
             <AnimatePresence>
                 {toast && (
                     <motion.div
