@@ -46,7 +46,7 @@ async function getFileSha(filePath: string): Promise<string | null> {
 async function uploadToGitHub(fileName: string, imageDataUrl: string) {
   const filePath = `public/walls/${fileName}`;
   const sha = await getFileSha(filePath);
-  const commitMessage = sha ? `Update ${fileName}` : `Upload ${fileName}`;
+  const commitMessage = sha ? `Update ${fileName} [skip ci]` : `Upload ${fileName} [skip ci]`;
 
   // Decode the Base64 content before uploading
   const content = imageDataUrl.split(",")[1]; // Get the Base64 part
