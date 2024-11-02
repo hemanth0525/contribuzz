@@ -19,8 +19,12 @@ export const metadata = {
   keywords: 'Open Source, Contributors, GitHub, Recognition, Community Engagement, Developer Motivation, Contributors Wall, Open Source Contributions, Celebrate Contributors',
   author: 'Hemanth M',
   robots: 'index, follow',
+  ogTitle: 'Contri.buzz - Celebrate Your Open Source Contributors',
+  ogDescription: "Showcase a contributors' wall in your GitHub README.md/App. Highlight contributors and build community.",
+  ogImage: '/icon.svg',
+  ogUrl: 'https://contri.buzz',
+  ogType: 'website',
 }
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // Add the Google Analytics tracking ID
@@ -29,7 +33,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        {/* Google Tag (gtag.js) */}
+        {/* Meta Tags */}
+        <meta name="description" content={metadata.description} />
+        <meta name="keywords" content={metadata.keywords} />
+        <meta name="author" content={metadata.author} />
+        <meta name="robots" content={metadata.robots} />
+
+        {/* Open Graph Tags */}
+        <meta property="og:title" content={metadata.ogTitle} />
+        <meta property="og:description" content={metadata.ogDescription} />
+        <meta property="og:image" content={metadata.ogImage} />
+        <meta property="og:url" content={metadata.ogUrl} />
+        <meta property="og:type" content={metadata.ogType} />
+
+        {/* Google Analytics */}
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}></script>
         <script
           dangerouslySetInnerHTML={{
