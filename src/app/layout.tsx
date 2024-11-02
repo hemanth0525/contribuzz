@@ -58,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        <script defer data-website-id="67263374b00f00e0fd08ab49" data-domain="contri.buzz" src="https://datafa.st/js/script.js"></script>
       </head>
       <body>
         <div className="scroll-container">
