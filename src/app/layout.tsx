@@ -40,8 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="author" content={metadata.author} />
         <meta name="robots" content={metadata.robots} />
 
-        {/* Adsterra Popunder */}
-        <Script type='text/javascript' src='//pl25287541.profitablecpmrate.com/d0/dd/83/d0dd8380cf9681126c97c439f68f3283.js'></Script>
+        <Script type='text/javascript' src='//pl25287694.profitablecpmrate.com/d2/44/3d/d2443dbe7f4b5d064d10d6c4b11aacc1.js'></Script>
 
         {/* Open Graph Tags */}
         <meta property="og:title" content={metadata.ogTitle} />
