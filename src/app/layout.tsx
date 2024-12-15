@@ -1,6 +1,7 @@
 // RootLayout.tsx
 import './globals.css'
 import Inter from 'next/font/local'
+import Script from 'next/script'
 import { OverlayScrollbars, ClickScrollPlugin } from 'overlayscrollbars'
 import 'overlayscrollbars/overlayscrollbars.css'
 
@@ -38,6 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="keywords" content={metadata.keywords} />
         <meta name="author" content={metadata.author} />
         <meta name="robots" content={metadata.robots} />
+
+        {/* Adsterra Popunder */}
+        <Script type='text/javascript' src='//pl25287541.profitablecpmrate.com/d0/dd/83/d0dd8380cf9681126c97c439f68f3283.js'></Script>
 
         {/* Open Graph Tags */}
         <meta property="og:title" content={metadata.ogTitle} />
