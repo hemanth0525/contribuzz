@@ -10,7 +10,7 @@ const { logger } = Sentry;
 export async function GET(req: NextRequest) {
   try {
     // Attempt to get IP address, prioritizing req.ip
-    const ip = req.ip || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
     const userAgent = req.headers.get('user-agent');
     const timestamp = new Date().toISOString();
 
